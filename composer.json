@@ -1,0 +1,16 @@
+{
+    "name": "blwsh/basket",
+    "description": "",
+    "authors": [
+        {
+            "name": "Ben Watson",
+            "email": "ben@blw.sh"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "blwsh\\basket\\": "./src"
+        }
+    }
+}
