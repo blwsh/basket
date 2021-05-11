@@ -1,6 +1,7 @@
 {
     "name": "blwsh/basket",
     "description": "A simple basket package which demonstrates use of TDD to develop functionality using PHP.",
+    "license": "GPL-3.0-only",
     "authors": [
         {
             "name": "Ben Watson",
