@@ -5,5 +5,3 @@ services:
     build:
       context: .
       dockerfile: etc/app.dockerfile
-    volumes:
-    - .:/src:delegated

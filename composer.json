@@ -7,10 +7,21 @@
             "email": "ben@blw.sh"
         }
     ],
-    "require": {},
     "autoload": {
         "psr-4": {
             "blwsh\\basket\\": "./src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "blwsh\\basket\\Tests\\": "./src/tests"
+
+        }
+    },
+    "scripts": {
+        "test": "/vendor/bin/phpunit"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
     }
 }

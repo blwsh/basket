@@ -1,32 +1,68 @@
 <?php namespace blwsh\basket;
 
+use blwsh\basket\Contracts\Purchasable;
+use JsonSerializable;
+
 /**
  * Class Basket
  *
  * @package blwsh\basket
  */
-class Basket
+class Basket implements JsonSerializable
 {
     /**
      * @var BasketItem[]
      */
-    protected $items = [];
+    protected array $items = [];
 
     /**
      * @return BasketItem[]
      */
-    public function items()
+    public function items(): array
     {
         return $this->items;
     }
 
-    public function addBasketItem(BasketItem $item)
+    /**
+     * @return bool
+     */
+    public function hasBasketItem(): bool
     {
-        $this->items[] = $item;
+        return false;
     }
 
-    public function removeBasketItem(BasketItem $item)
+    /**
+     * @param Purchasable $item
+     *
+     * @return $this
+     */
+    public function add(Purchasable $item): self
     {
-        echo array_search($item->id, array_column($this->items(), 'id')); // prints 0 (!== false)
+        if ($this->hasBasketItem()) {
+
+        } else {
+            $this->items[] = new BasketItem(
+                $this, $item, 1
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param BasketItem $item
+     *
+     * @return $this
+     */
+    public function remove(BasketItem $item): self
+    {
+        return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'items' => $this->items()
+        ];
     }
 }
