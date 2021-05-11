@@ -1,6 +1,6 @@
 # blwsh/basket
 
-A simple basket package which demonstrates use of TDD to develop funcotnality using PHP.
+A simple basket package which demonstrates use of TDD to develop functionality using PHP.
 
 ## Requirements
 

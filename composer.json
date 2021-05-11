@@ -1,6 +1,6 @@
 {
     "name": "blwsh/basket",
-    "description": "",
+    "description": "A simple basket package which demonstrates use of TDD to develop functionality using PHP.",
     "authors": [
         {
             "name": "Ben Watson",
