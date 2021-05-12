@@ -1,6 +1,5 @@
 <?php namespace blwsh\basket;
 
-use blwsh\basket\Contracts\Purchasable;
 use JsonSerializable;
 
 /**
@@ -24,42 +23,62 @@ class Basket implements JsonSerializable
     }
 
     /**
+     * @param BasketItem $item
+     *
      * @return bool
      */
-    public function hasBasketItem(): bool
+    public function hasBasketItem(BasketItem $item): bool
     {
-        return false;
+        return isset($this->items[$item->id()]);
     }
 
     /**
-     * @param Purchasable $item
+     * Adds new items to the basket items array and increments existing basket item quantities.
+     *
+     * @param BasketItem $item
+     * @param int        $quantity
      *
      * @return $this
+     * @throws InvalidQuantityException
      */
-    public function add(Purchasable $item): self
+    public function add(BasketItem $item, $quantity = 1): self
     {
-        if ($this->hasBasketItem()) {
+        $item->setBasket($this);
 
+        if (!$this->hasBasketItem($item)) {
+            $this->items[$item->id()] = $item;
+        }
+
+        $item->setQuantity($item->quantity() + $quantity);
+
+        return $this;
+    }
+
+    /**
+     * Decrements the basket item quantity. If the new basket quantity is zero or less, the basket item is removed from
+     * the basket.
+     *
+     * @param BasketItem $item
+     * @param int        $quantity
+     *
+     * @return $this
+     * @throws InvalidQuantityException
+     */
+    public function remove(BasketItem $item, $quantity = 1): self
+    {
+        if ($item->quantity() - $quantity > 0) {
+            $item->setQuantity($item->quantity() - $quantity);
         } else {
-            $this->items[] = new BasketItem(
-                $this, $item, 1
-            );
+            unset($this->items[$item->id()]);
         }
 
         return $this;
     }
 
     /**
-     * @param BasketItem $item
-     *
-     * @return $this
+     * @return BasketItem[][]
      */
-    public function remove(BasketItem $item): self
-    {
-        return $this;
-    }
-
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'items' => $this->items()

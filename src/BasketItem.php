@@ -1,7 +1,9 @@
 <?php namespace blwsh\basket;
 
 use blwsh\basket\Contracts\Purchasable;
+use blwsh\basket\Contracts\Stockable;
 use blwsh\basket\Traits\HasAttributes;
+use blwsh\basket\Utils\UUID;
 use JsonSerializable;
 
 /**
@@ -14,41 +16,92 @@ class BasketItem implements JsonSerializable
     use HasAttributes;
 
     /**
+     * @var string
+     */
+    protected string $id;
+    /**
      * @var int
      */
     protected int $total = 0;
-
     /**
      * @var int
      */
     protected int $discountedTotal = 0;
-
     /**
      * @var array
      *
      * @note Probably a good idea to use a collection here for discount
      */
     protected array $discountPolicies = [];
+    /**
+     * @var Basket
+     */
+    protected Basket $basket;
 
     /**
      * BasketItem constructor.
      *
-     * @param Purchasable $purchasable
-     * @param int         $quantity
-     * @param Basket      $basket
+     * @param Purchasable|Stockable $purchasable
+     * @param int                   $quantity
+     *
+     * @throws InvalidQuantityException
      */
     public function __construct(
-        protected Basket $basket,
-        protected Purchasable $purchasable,
-        protected int $quantity = 1,
-    ) {
+        protected Purchasable|Stockable $purchasable,
+        protected int $quantity = 0,
+    )
+    {
         $this->total = $this->purchasable->getPrice();
+        $this->id = UUID::generate();
+        $this->setQuantity($this->quantity);
+    }
 
-        try {
-            $this->setQuantity($this->quantity ?? 1);
-        } catch (InvalidQuantityException) {
-            // We know the quantity can never be zero so we can ignore this exception.
-        }
+    /**
+     * @return string
+     */
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return Basket
+     */
+    public function basket(): Basket
+    {
+        return $this->basket;
+    }
+
+    /**
+     * @param Basket $basket
+     */
+    public function setBasket(Basket $basket)
+    {
+        $this->basket = $basket;
+    }
+
+    /**
+     * @return Purchasable|Stockable
+     */
+    public function purchsable(): Purchasable|Stockable
+    {
+        return $this->purchasable;
+    }
+
+    /**
+     * @return int
+     */
+    public function total(): int
+    {
+        return $this->total;
+    }
+
+    /**
+     * @return int
+     */
+    public function discountedTotal(): int
+    {
+        return $this->discountedTotal;
     }
 
     /**
@@ -60,14 +113,6 @@ class BasketItem implements JsonSerializable
     }
 
     /**
-     * @return Purchasable
-     */
-    public function purchsable(): Purchasable
-    {
-        return $this->purchasable;
-    }
-
-    /**
      * @param int $quantity
      *
      * @throws InvalidQuantityException
@@ -75,19 +120,10 @@ class BasketItem implements JsonSerializable
     public function setQuantity(int $quantity)
     {
         // We could just call removeFromBasket but this could lead to bugs so I've opted to show an error instead.
-        if ($quantity < 1) throw new InvalidQuantityException;
+        if ($quantity < 0) throw new InvalidQuantityException;
 
         $this->quantity = $quantity;
         $this->total = $quantity * $this->purchasable->getPrice();
-    }
-
-    /**
-     *
-     */
-    public function removeFromBasket(): bool
-    {
-        $this->basket->remove($this);
-        return true;
     }
 
     /**

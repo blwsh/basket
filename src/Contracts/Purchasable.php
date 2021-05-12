@@ -1,5 +1,7 @@
 <?php namespace blwsh\basket\Contracts;
 
+use blwsh\basket\BasketItem;
+
 /**
  * Interface Purchasable
  *
@@ -14,4 +16,5 @@ interface Purchasable
      * @return int
      */
     public function getPrice(): int;
+    public function toBasketItem(): BasketItem;
 }

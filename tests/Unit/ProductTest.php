@@ -1,4 +1,4 @@
-<?php namespace blwsh\basket\Tests;
+<?php namespace blwsh\basket\Tests\Unit;
 
 use blwsh\basket\Product;
 use PHPUnit\Framework\TestCase;

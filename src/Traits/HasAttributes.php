@@ -3,6 +3,8 @@
 /**
  * Trait HasAttributes
  *
+ * Allows arbitrary properties for any class which uses the trait.
+ *
  * @package blwsh\basket\Traits
  */
 trait HasAttributes
@@ -54,5 +56,13 @@ trait HasAttributes
     public function __isset(string $name): bool
     {
         return isset($this->attributes[$name]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 }

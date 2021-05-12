@@ -1,8 +1,8 @@
 <?php namespace blwsh\basket;
 
-use Exception;
-use blwsh\basket\Contracts\Purchasable;
-use blwsh\basket\Traits\HasAttributes;
+use blwsh\basket\Utils\UUID;
+use blwsh\basket\Traits\{HasStock, HasAttributes};
+use blwsh\basket\Contracts\{Stockable, Purchasable};
 
 /**
  * Class Product
@@ -13,26 +13,22 @@ use blwsh\basket\Traits\HasAttributes;
  *
  * @package blwsh\basket
  */
-class Product implements Purchasable
+class Product implements Purchasable, Stockable
 {
-    use HasAttributes;
+    use HasAttributes, HasStock;
 
     /**
      * Product constructor.
      *
      * @param array $attributes
      */
-    public function __construct(array $attributes = ['price' => 0])
+    public function __construct(array ...$attributes)
     {
         $this->attributes = $attributes;
 
-        try {
-            // Set id as random 20 char string
-            $this->id = bin2hex(random_bytes(10));
-        } catch (Exception) {
-            // We're just going to ignore this for now. In reality, random_bytes will never throw an exception.
-            // Maybe could add logging here or a retry loop with a circuit break in the future.
-        }
+        if (!isset($attributes['price'])) $this->price = 0;
+
+        $this->id = UUID::generate();
     }
 
     /**
@@ -41,5 +37,14 @@ class Product implements Purchasable
     public function getPrice(): int
     {
         return $this->price;
+    }
+
+    /**
+     * @return BasketItem
+     * @throws InvalidQuantityException
+     */
+    public function toBasketItem(): BasketItem
+    {
+        return new BasketItem($this);
     }
 }
