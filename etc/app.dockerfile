@@ -19,7 +19,7 @@ RUN composer install
 # We copy in dependencies and packages from build stages here or anything else required for the run time.
 
 # Note: Never include credentials in a docker image (not even build stages)! These should always be included
-# via volume mounts or retrieved via some sort of credentials mechancism.
+# via volume mounts or retrieved via some sort of credentials mechanism.
 FROM base
 COPY ./etc/nginx.conf /etc/nginx/conf.d/basket.dev.conf
 COPY ./etc/php.ini /usr/local/php/conf.d/basket.dev.ini
