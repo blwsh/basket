@@ -28,7 +28,7 @@ class BasketTest extends TestCase
     {
         parent::setUp();
         $this->basket = new Basket;
-        $this->testProduct = new Product(['name' => 'Test Product One', 'price' => 100]);
+        $this->testProduct = (new Product(['name' => 'Test Product One', 'price' => 100]))->ignoreStockChecks();
     }
 
     /**
@@ -128,7 +128,7 @@ class BasketTest extends TestCase
     {
         $basket = $this->modifyBasketItemCount(
             new Basket,
-            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->toBasketItem(),
+            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->ignoreStockChecks()->toBasketItem(),
             $total = 10,
             'add'
         );
@@ -144,7 +144,7 @@ class BasketTest extends TestCase
     {
         $basket = $this->modifyBasketItemCount(
             new Basket,
-            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->toBasketItem(),
+            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->ignoreStockChecks()->toBasketItem(),
             $total = 10,
             'add'
         );
@@ -161,7 +161,7 @@ class BasketTest extends TestCase
         // Add items to basket
         $basket = $this->modifyBasketItemCount(
             new Basket,
-            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->toBasketItem(),
+            $item = (new Product(['name' => 'Test Product', 'price' => $itemPrice = 100]))->ignoreStockChecks()->toBasketItem(),
             $total = 10,
             'add'
         );

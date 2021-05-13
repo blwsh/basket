@@ -12,9 +12,6 @@ use blwsh\basket\BasketItem;
  */
 interface Purchasable
 {
-    /**
-     * @return int
-     */
     public function getPrice(): int;
     public function toBasketItem(): BasketItem;
 }

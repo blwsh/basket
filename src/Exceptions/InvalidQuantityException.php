@@ -1,4 +1,4 @@
-<?php namespace blwsh\basket;
+<?php namespace blwsh\basket\Exceptions;
 
 use Exception;
 

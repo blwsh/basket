@@ -1,59 +1,96 @@
 <?php namespace blwsh\basket\Tests\E2E;
 
-use blwsh\basket\Basket;
-use blwsh\basket\BasketItem;
-use blwsh\basket\DiscountPolicy;
-use blwsh\basket\InvalidQuantityException;
-use blwsh\basket\Product;
-use DateTime;
 use PHPUnit\Framework\TestCase;
+use blwsh\basket\{Basket, Exceptions\UnableToAddToBasketException, Product, StockRecord};
 
+/**
+ * Class BuyAPieTest
+ *
+ * @package blwsh\basket\Tests\E2E
+ */
 class BuyAPieTest extends TestCase
 {
+    /**
+     * @var Basket
+     */
+    protected Basket $basket;
+
     /**
      * @var Product
      */
     protected Product $product;
 
+    /**
+     * @var Product
+     */
+    protected Product $aboutToExpireProduct;
+
+    /**
+     * @var Product
+     */
+    protected Product $expiredProduct;
+
+    /**
+     *
+     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->product = $pie = new Product([
+        $this->basket = new Basket;
+
+        $this->product = new Product([
             'name' => 'Pie',
             'price' => 320,
             'stock' => [
-                ['stock' => 100, 'expires' => (new DateTime('tomorrow'))->format('Y-m-d H:i:s')]
+                new StockRecord(100, timestamp('now'), timestamp('+1 day'))
+            ]
+        ]);
+
+        $this->aboutToExpireProduct = new Product([
+            'name' => 'Pie',
+            'price' => 320,
+            'stock' => [
+                new StockRecord(100, timestamp('-1 day'), timestamp('+1 minute'))
+            ]
+        ]);
+
+        $this->expiredProduct = new Product([
+            'name' => 'Pie',
+            'price' => 320,
+            'stock' => [
+                new StockRecord(100, timestamp('-2 day ago'), timestamp('-1 day'))
             ]
         ]);
     }
 
     /**
-     * @throws InvalidQuantityException
+     * @throws UnableToAddToBasketException
      */
     public function testCanBuyBeforeExpiryDate()
     {
-        $basket = new Basket;
-
-        $basket->add($item = $this->product->toBasketItem());
-
-        // Check the item is in basket
-        $this->assertTrue($basket->hasBasketItem($item));
+        // Add the item to the basket and make sure it's in there.
+        $this->basket->add($item = $this->product->toBasketItem());
+        $this->assertTrue($this->basket->hasBasketItem($item));
     }
 
+    /**
+     * @throws UnableToAddToBasketException
+     */
     public function testCanNotBuyWhenPastExpiryDate()
     {
-
+        // When we try to add an item that has expired, the add method should throw UnableToAddToBasketException.
+        $this->expectException(UnableToAddToBasketException::class);
+        $this->basket->add($item = $this->expiredProduct->toBasketItem());
     }
 
+    /**
+     * @throws UnableToAddToBasketException
+     */
     public function testDiscountAppliedOnExpiryDate()
     {
-        $discount = new DiscountPolicy(
-            amount: 50,
-            type: 'percentage',
-            rules: [
-                fn(BasketItem $item) => $item->purchsable()->hasExpiringStock((new DateTime('tomorrow'))->format('Y-m-d H:i:s'))
-            ]
-        );
+        $this->basket->add($item = $this->aboutToExpireProduct->toBasketItem());
+        $this->assertTrue($this->basket->hasBasketItem($item));
+        $this->assertEquals(160, $item->discountedTotal());
     }
 }

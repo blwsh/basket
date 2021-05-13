@@ -26,7 +26,15 @@ trait HasAttributes
      */
     public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes;
+        $this->setAttributes($attributes);
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function setAttributes(array $attributes)
+    {
+        foreach ($attributes as $key => $value) $this->$key = $value;
     }
 
     /**
@@ -53,6 +61,11 @@ trait HasAttributes
         }
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function __isset(string $name): bool
     {
         return isset($this->attributes[$name]);

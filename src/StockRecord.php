@@ -1,5 +1,10 @@
 <?php namespace blwsh\basket;
 
+/**
+ * Class StockRecord
+ *
+ * @package blwsh\basket
+ */
 class StockRecord
 {
     /**

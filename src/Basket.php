@@ -1,6 +1,8 @@
 <?php namespace blwsh\basket;
 
+use blwsh\basket\DiscountPolicies\DiscountAboutToExpireItems;
 use JsonSerializable;
+use blwsh\basket\Exceptions\UnableToAddToBasketException;
 
 /**
  * Class Basket
@@ -33,16 +35,37 @@ class Basket implements JsonSerializable
     }
 
     /**
+     * @param BasketItem $item
+     *
+     * @return bool
+     */
+    public function canAddToBasket(BasketItem $item): bool
+    {
+        return $item->purchsable()->hasStock(timestamp('now'))
+            && !$item->purchsable()->isStockExpired(timestamp('now'));
+    }
+
+    /**
      * Adds new items to the basket items array and increments existing basket item quantities.
      *
      * @param BasketItem $item
      * @param int        $quantity
      *
      * @return $this
-     * @throws InvalidQuantityException
+     * @throws UnableToAddToBasketException
      */
     public function add(BasketItem $item, $quantity = 1): self
     {
+        if (!$this->canAddToBasket($item)) {
+            throw new UnableToAddToBasketException;
+        }
+
+        // This should really come from a global store which applies global discount policies based on conditions
+        // but for now we'll do it here.
+        if ($item->purchsable()->hasExpiringStock(timestamp('now'))) {
+            $item->applyDiscount(new DiscountAboutToExpireItems);
+        }
+
         $item->setBasket($this);
 
         if (!$this->hasBasketItem($item)) {
@@ -62,7 +85,6 @@ class Basket implements JsonSerializable
      * @param int        $quantity
      *
      * @return $this
-     * @throws InvalidQuantityException
      */
     public function remove(BasketItem $item, $quantity = 1): self
     {

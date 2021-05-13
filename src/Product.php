@@ -18,16 +18,19 @@ class Product implements Purchasable, Stockable
     use HasAttributes, HasStock;
 
     /**
+     * @var array|int[]
+     */
+    protected array $defaultAttributes = ['price' => 0];
+
+    /**
      * Product constructor.
      *
      * @param array $attributes
      */
-    public function __construct(array ...$attributes)
+    public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes;
 
-        if (!isset($attributes['price'])) $this->price = 0;
-
+        $this->setAttributes(array_merge($this->defaultAttributes, $attributes));
         $this->id = UUID::generate();
     }
 
@@ -41,7 +44,6 @@ class Product implements Purchasable, Stockable
 
     /**
      * @return BasketItem
-     * @throws InvalidQuantityException
      */
     public function toBasketItem(): BasketItem
     {
