@@ -24,4 +24,5 @@ FROM base
 COPY ./etc/nginx.conf /etc/nginx/conf.d/basket.dev.conf
 COPY ./etc/php.ini /usr/local/php/conf.d/basket.dev.ini
 COPY --from=dependencies /src/vendor /src/vendor
+ENTRYPOINT composer run test
 
